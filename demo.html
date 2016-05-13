@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="telephone=no,email=no" name="format-detection">
+    <meta content="fullscreen=yes,preventMove=no" name="ML-Config">
+    <meta id="viewport" name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>XLDebug Demo</title>
+    <script src="XLDebug.js"></script>
+    <script>
+        // 使用 xlconsole 方法
+        // 一定要写在 XLDebug.log.init 前面
+        //XLDebug.openxlconsole();
+
+        //XLDebug.finger.close();
+        
+
+        XLDebug.log.openSysConsole();
+        
+    </script>
+</head>
+<body>
+<h3>双手指按10下开启log调试模式</h3>
+<h3>4手指按下，强制页面刷新</h3>
+<script>
+
+    console.log(123);
+    console.log("abc");
+    console.log(true);
+    console.log(undefined);
+    console.log(null);
+    
+    var fn = function(){
+        alert(1);
+    }
+    console.log(fn);
+    
+    var obj = {
+        "a" : 1,
+        "b" : [1,2,3],
+        "c" : function(){alert(4)},
+        "d" : "ccc",
+        "e" : {p: 666}
+    }
+    console.log(obj);
+
+    console.log([5,6,7,8]);
+    
+    
+    console.log(1, "a", [7,6], {"c":1}, null);
+    // ======================================================================================
+    
+    xlconsole.log(999);
+    
+    
+    
+    
+</script>
+
+</body>
+</html>
