@@ -93,15 +93,12 @@
 //        var maxJishu = 5;
 //        var fingers = 1;
 
-        // 开启调试时间：15分钟
-        var autoCloseTime = 15;
-
         var STATUS = {
-            consoleDatahide : 0,
-            consoleDataShow : 1
+            hide : 0,
+            show : 1
         };
 
-        var curStatus = STATUS.consoleDatahide;
+        var curStatus = STATUS.hide;
 
         var cacheName = '_xl_xldebug_rewriteConsole_key';
 
@@ -172,8 +169,14 @@
                             return; 
                         }
 
-                        // 已显示，就不再处理了
-                        if (curStatus === STATUS.consoleDataShow) return;
+                        // 如果已显示，3个手指点1次，关闭log窗口
+                        if (curStatus === STATUS.show) {
+                            if(ev.touches.length === 3){
+                                that.hide();
+                            }
+                            
+                            return;
+                        };
 
                         if(ev.touches.length === fingers){
                             if( beiginTime === 0 ) {
@@ -181,11 +184,13 @@
                             }
                             
                             jishu++;
+                            // console.log(jishu);
                         }
 
                         if( jishu >= maxJishu ) {
                             endTime = +new Date();
                             // 在maxTime触发了彩蛋，显示log
+                            // console.log(endTime - beiginTime, maxTime);
                             if( endTime - beiginTime <= maxTime ) {
                                 that.show();
                             }
@@ -218,17 +223,17 @@
                                 'list-style: none !important;'+
                             '}'+
                             'body .__xl_debug_console_pop{'+
-                                'position: absolute;'+
+                                'position: fixed;'+
                                 'z-index: 999999;'+
+                                'width: 100%;'+
+                                'height: 100%;'+
                                 'left: 0;'+
                                 'top: 0;'+
                                 'right: 0;'+
                                 'bottom: 0;'+
-                                'opacity: 0.9;'+
                                 'background-color: #000;'+
-                                'color: #fff;'+
+                                'color: #fff; overflow-y:scroll;'+
                                 'font-size: 0.8em;'+
-                                'overflow-y: scroll;'+
                             '}'+
                             'body .__xl_debug_console_pop ul{'+
                                 'padding: 0 0 40px;'+
@@ -264,7 +269,7 @@
                             '    width: 40px;'+
                             '    height: 40px;'+
                             '    line-height: 40px;'+
-                            '    color: #fff;'+
+                            '    color: #fff; display:none;'+
                             '    text-align: center;'+
                             '}';
 
@@ -281,21 +286,22 @@
             show: function(){
                 var that = this;
 
-                if( curStatus === STATUS.consoleDataShow ) return;
-                curStatus = STATUS.consoleDataShow;
+                if( curStatus === STATUS.show ) return;
+                curStatus = STATUS.show;
 
                 that.insertStyle();
 
                 var htmlStr =
+                        '<p style="padding: 10px 0 0 0; font-size: 16px !important;">【提示：3个手指点1次关闭调试】</p>' + 
                         '<span class="'+popCloseClassName+'" id="'+popCloseId+'">close</span>'+
                         '<ul id="'+ popUlId +'"></ul>';
 
                 var pop = document.createElement('div');
                 pop.id = popId;
                 pop.className = popClassName;
-                pop.innerHTML = htmlStr;
-
                 document.body.appendChild(pop);
+
+                document.querySelector("#" + popId).innerHTML = htmlStr;
 
                 // 插入数据
                 var liStr = '';
@@ -337,7 +343,7 @@
                 document.querySelector("#" + popUlId).innerHTML = liStr;
 
                 // 绑定关闭按钮
-                var popCloseBtn = document.getElementById(popCloseId);
+                var popCloseBtn = document.querySelector("#" + popCloseId);
 
                 function bindPopClose(){
                     that.hide();
@@ -345,8 +351,6 @@
 
                 popCloseBtn.removeEventListener('click', bindPopClose);
                 popCloseBtn.addEventListener('click', bindPopClose, false);
-
-                document.querySelector('html').style.overflow = "hidden";
             },
 
             // 隐藏log数据
@@ -354,11 +358,10 @@
                 var pop = document.getElementById(popId);
 
                 if(pop) {
-                    curStatus = STATUS.consoleDatahide;
+                    curStatus = STATUS.hide;
                     pop.parentNode.removeChild(pop);
 
                     document.querySelector('html').style.overflow = "static";
-                    
                 }
             },
 
