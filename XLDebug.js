@@ -218,10 +218,8 @@
                                 'list-style: none !important;'+
                             '}'+
                             'body .__xl_debug_console_pop{'+
-                                'position: fixed;'+
+                                'position: absolute;'+
                                 'z-index: 999999;'+
-                                'width: 100%;'+
-                                'height: 100%;'+
                                 'left: 0;'+
                                 'top: 0;'+
                                 'right: 0;'+
