@@ -33,5 +33,10 @@ XLDebug.log.close();
 XLDebug.log.open();
 ```
 
-### 结尾
-1. 后续会添加 `window.onerror` 的基本监听和展示
+### Changelog
+- 2016-05-18 | 添加了运行时错误的监听(window.onerror)
+
+### 截图
+![demo.html截图](demo.jpg)
+
+

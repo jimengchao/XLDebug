@@ -56,6 +56,8 @@
         }
     })();
     
+    var errorSign = '__js_error__';
+    
     // 打印日志管理
     var log = (function(){
 
@@ -67,7 +69,7 @@
 
         var consoleData = [];
         var oldConsole = console;
-
+        
         var popStyleId = '__xl_js_debug_console_pop_style';
         var popId = '__xl_js_debug_console_pop';
         var popClassName = '__xl_debug_console_pop';
@@ -88,8 +90,8 @@
         
         // 在chrome上的测试时需要的参数
         // 线上需要注释掉的
-        // var maxJishu = 5;
-        // var fingers = 1;
+//        var maxJishu = 5;
+//        var fingers = 1;
 
         // 开启调试时间：15分钟
         var autoCloseTime = 15;
@@ -205,39 +207,48 @@
                 doOnce(function(){
                     var styleStr =
                             'body .__xl_debug_console_pop, body .__xl_debug_console_pop *{'+
-                            'margin: 0;'+
-                            'font-family: "menlo", "monospace", "Consolas", "Helvetica Neue", Helvetica, STHeiTi, sans-serif;'+
-                            'padding: 0;'+
-                            'font-size:12px !important;'+
-                            'word-break:break-all !important;'+
-                            'word-wrap:break-word !important;'+
-                            '-webkit-user-select: all !important;'+
-                            'user-select: all !important'+
-                            'list-style: none !important;'+
+                                'margin: 0;'+
+                                'font-family: "menlo", "monospace", "Consolas", "Helvetica Neue", Helvetica, STHeiTi, sans-serif;'+
+                                'padding: 0;'+
+                                'font-size:12px !important;'+
+                                'word-break:break-all !important;'+
+                                'word-wrap:break-word !important;'+
+                                '-webkit-user-select: all !important;'+
+                                'user-select: all !important'+
+                                'list-style: none !important;'+
                             '}'+
                             'body .__xl_debug_console_pop{'+
-                            'position: fixed;'+
-                            'z-index: 999999;'+
-                            'width: 100%;'+
-                            'height: 100%;'+
-                            'left: 0;'+
-                            'top: 0;'+
-                            'right: 0;'+
-                            'bottom: 0;'+
-                            'opacity: 0.9;'+
-                            'background-color: #000;'+
-                            'color: #fff;'+
-                            'font-size: 0.8em;'+
-                            'overflow-y: scroll;'+
+                                'position: fixed;'+
+                                'z-index: 999999;'+
+                                'width: 100%;'+
+                                'height: 100%;'+
+                                'left: 0;'+
+                                'top: 0;'+
+                                'right: 0;'+
+                                'bottom: 0;'+
+                                'opacity: 0.9;'+
+                                'background-color: #000;'+
+                                'color: #fff;'+
+                                'font-size: 0.8em;'+
+                                'overflow-y: scroll;'+
                             '}'+
                             'body .__xl_debug_console_pop ul{'+
-                            'padding: 6px 0 40px;'+
+                                'padding: 0 0 40px;'+
                             '}'+
                             'body .__xl_debug_console_pop ul li{'+
                             '    padding: 6px;'+
                             '}'+
+                            'body .__xl_debug_console_pop ul li b{'+
+                            '    padding:0 4px 0 0;'+
+                            '}'+
+                            'body .__xl_debug_console_pop ul li.error{'+
+                            '   background-color: #E60808; '+
+                            '}'+
                             'body .__xl_debug_console_pop ul li:nth-child(2n) {'+
                             '    background-color: #3E3636;'+
+                            '}'+
+                            'body .__xl_debug_console_pop ul li.error:nth-child(2n) {'+
+                            '    background-color: #BB2727;'+
                             '}'+
                             'body .__xl_debug_console_pop ul li span{'+
                             '    padding: 2px 4px !important;'+
@@ -294,23 +305,35 @@
                 for(var i = 0, len = consoleData.length; i<len; i++) {
                     var d = consoleData[i];
                     var spanStr = '';
+                    
+                    // 错误信息
+                    if( d[0] === errorSign ) {
 
-                    for(var j = 0; j< d.length; j++){
-                        var s = '';
-                        var t = d[j];
+                        spanStr = '<span><b>[error-message]</b>'+ d[1] +'</span>';
+                        spanStr += '<span><b>[error-source]</b>'+ d[2] +'</span>';
+                        spanStr += '<span><b>[error-line]</b>'+ d[3] +'</span>';
+                        
+                        liStr += '<li class="error">'+ spanStr +'</li>';
+                        
+                    }else{  // 正常信息
 
-                        if( typeof t == 'function' ) {
-                            s = t.toString();
-                        }else {
-                            s = JSON.stringify(t);
+                        for(var j = 0; j< d.length; j++){
+                            var s = '';
+                            var t = d[j];
+
+                            if( typeof t == 'string' ){
+                                s = t;
+                            }else if( typeof t == 'function' ) {
+                                s = t.toString();
+                            }else {
+                                s = JSON.stringify(t);
+                            }
+
+                            spanStr += '<span><b>['+ Object.prototype.toString.call(t).split(" ")[1] +'</b>' + s +'</span>';
                         }
-
-                        spanStr += '<span>'+
-                            //'<b>原始数据：'+ t +'</b><br />' +
-                            '<b>['+ Object.prototype.toString.call(t).split(" ")[1] +'</b> ' + s +'</span>';
+                        
+                        liStr += '<li>'+ spanStr +'</li>';
                     }
-
-                    liStr += '<li>'+ spanStr +'</li>';
                 }
 
                 document.querySelector("#" + popUlId).innerHTML = liStr;
@@ -337,6 +360,7 @@
                     pop.parentNode.removeChild(pop);
 
                     document.querySelector('html').style.overflow = "static";
+                    
                 }
             },
 
@@ -376,5 +400,10 @@
     XLDebug.finger = finger;
     XLDebug.log = log;
 
+    window.onerror = function(message, source, lineno, colno, error){
+        xlconsole.log(errorSign, message, source, lineno);
+        return false;
+    }
+    
     return XLDebug;
 });
